@@ -41,7 +41,7 @@
       <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Home">home</button>
       <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Search">search</button>
       <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Table">table_chart</button>
-      <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Show Table">show_chart</button>
+      <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Show Table">map</button>
     </section>
   </div>
 </header>
@@ -50,18 +50,28 @@
 
 
 <main class="mdc-top-app-bar--fixed-adjust">
-      <div class="view" content="Home" id="Home">
+
+<div class="view" content="Home" id="Home">
       <h1 class="mdc-typography--headline2">Home</h1>
-       <p class="mdc-typography--Body1"> This info is taken from
-          <a href="https://pomber.github.io/covid19/timeseries.json">https://pomber.github.io/covid19/timeseries.json</a>
-          </p>
-      </div>
+</div>
       
-<div class="view" content="Search" id="Search"></div>
+<div class="view" content="Search" id="Search">
+
+    <video id="video" width="640" height="480" autoplay></video>
+    <button id="snap">Snap Photo</button>
+    <canvas id="canvas" width="640" height="480"></canvas>
+
+</div>
       
-<div class="view" content="Table"id="Table"></div>
+<div class="view" content="Table"id="Table">
+<!-- 2 endpoints data and table code-->
+</div>
       
-<div class="view " content="Chart"id="Chart"></div>
+<div class="view " content="Chart"id="Chart">
+<!-- Map code -->
+    
+</div>
+    
   </main>
       
   
@@ -104,7 +114,22 @@
         })
     });
     
-        
+var canvas = document.getElementById('canvas');
+var context = canvas.getContext('2d');
+var video = document.getElementById('video');
+
+if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+        //video.src = window.URL.createObjectURL(stream);
+        video.srcObject = stream;
+        video.play();
+    });
+}
+
+document.getElementById("snap").addEventListener("click", function() {
+	context.drawImage(video, 0, 0, 640, 480);
+});
+   
     </script>
   </body>
 </html>

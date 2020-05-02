@@ -7,7 +7,10 @@
   <link href="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css" rel="stylesheet">
   <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="manifest" href="manifest.json" />
+  <!--<link rel="manifest" href="manifest.json" crossorigin="use-credentials" />-->
+  <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDtJXZwqspsmUyVoJ34zK9K0Msem2buMPE&callback=initMap">
+    </script>
 
   <style>
     :root {
@@ -28,6 +31,10 @@
       #temp{
           display:none;
       }
+      #map{
+          height:91vh;
+          width:99vw;
+      }
   </style>
 
   </head>
@@ -39,7 +46,7 @@
     </section>
     <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
       <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Home">home</button>
-      <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Search">search</button>
+      <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Search">add_a_photo</button>
       <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Table">table_chart</button>
       <button class="material-icons mdc-top-app-bar__action-item mdc-icon-button" aria-label="Show Table">map</button>
     </section>
@@ -58,7 +65,10 @@
 <div class="view" content="Search" id="Search">
 
     <video id="video" width="640" height="480" autoplay></video>
-    <button id="snap">Snap Photo</button>
+    <button class="mdc-button--outlined" id="snap">
+      <div class="mdc-button__ripple"></div>
+      <span class="mdc-button__label">Snap Photo</span>
+      </button>
     <canvas id="canvas" width="640" height="480"></canvas>
 
 </div>
@@ -69,21 +79,22 @@
       
 <div class="view " content="Chart"id="Chart">
 <!-- Map code -->
-    
+    <div id="map"></div>
 </div>
     
   </main>
       
   
 <script>
-    if ("serviceWorker" in navigator) {
+    
+   /*if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
     navigator.serviceWorker
       .register("/serviceWorker.js")
       .then(res => console.log("service worker registered"))
       .catch(err => console.log("service worker not registered", err))
   })
-}
+}*/
     mdc.topAppBar.MDCTopAppBar.attachTo(document.querySelector('header.mdc-top-app-bar'));
     document.querySelectorAll('.mdc-top-app-bar__section--align-end button').forEach(item=>{
         item.addEventListener("click",(event)=>{
@@ -93,7 +104,7 @@
                 })
                 document.querySelector('.view#Home').style.display="block";
             }
-            if(item.textContent=="search"){
+            if(item.textContent=="add_a_photo"){
                 document.querySelectorAll('.view').forEach(item=>{
                     item.style.display="none";
                 })
@@ -105,7 +116,7 @@
                 })
                 document.querySelector('.view#Table').style.display="block";
             }
-            if(item.textContent=="show_chart"){
+            if(item.textContent=="map"){
                 document.querySelectorAll('.view').forEach(item=>{
                     item.style.display="none";
                 })
@@ -119,9 +130,8 @@ var context = canvas.getContext('2d');
 var video = document.getElementById('video');
 
 if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
-        //video.src = window.URL.createObjectURL(stream);
-        video.srcObject = stream;
+    navigator.mediaDevices.getUserMedia({ video: true }).then(function(obj) {
+        video.srcObject = obj;
         video.play();
     });
 }
@@ -130,6 +140,38 @@ document.getElementById("snap").addEventListener("click", function() {
 	context.drawImage(video, 0, 0, 640, 480);
 });
    
+function initMap() {
+  
+  var uic = {lat: 41.8698, lng: -87.6496};
+  
+  var map = new google.maps.Map(
+      document.getElementById('map'), {zoom: 15, center: uic});
+  
+   var contentString = '<div id="content">'+
+      '<div id="siteNotice">'+'</div>'+
+      '<img  src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/96/University_of_Illinois_at_Chicago_circle_logo.svg/1200px-University_of_Illinois_at_Chicago_circle_logo.svg.png" alt="uic" height="50" width="50>'+
+      '<div id="bodyContent">'+
+      '<p><b>University Of Illinois At Chicago</b>, also referred to as <b>UIC</b>,' +
+      'Located in the heart of one of the world’s great cities, the University of Illinois at Chicago is a vital part of the educational, technological and cultural fabric of the region. As Chicago’s only public research university with more than 33,000 students, 16 colleges, a hospital and a health sciences system, UIC provides students access to excellence and opportunity. </p>'+
+      '<p>webite: <a href="https://www.uic.edu/">'+
+      'https://www.uic.edu/</a> '+
+       '</div>'+
+      '</div>';
+
+  var infowindow = new google.maps.InfoWindow({
+    content: contentString
+  });
+
+  var marker = new google.maps.Marker({
+    position: uic,
+    map: map,
+    title: 'UIC'
+  });
+  marker.addListener('click', function() {
+    infowindow.open(map, marker);
+  });
+}
+    
     </script>
   </body>
 </html>

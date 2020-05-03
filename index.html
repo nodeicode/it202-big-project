@@ -7,7 +7,7 @@
   <link href="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.css" rel="stylesheet">
   <script src="https://unpkg.com/material-components-web@v4.0.0/dist/material-components-web.min.js"></script>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <!--<link rel="manifest" href="manifest.json" crossorigin="use-credentials" />-->
+  <link rel="manifest" href="manifest.json" crossorigin="use-credentials" />
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDtJXZwqspsmUyVoJ34zK9K0Msem2buMPE&callback=initMap">
     </script>
@@ -37,6 +37,10 @@
           height:91vh;
           width:99vw;
       }
+      .mdc-text-field{
+          width:20vw;
+      }
+      
   </style>
 
   </head>
@@ -79,8 +83,17 @@
 <!-- 2 endpoints data and table code-->
     <h1 class="mdc-typography--headline5">Chuck norris random quote from api:</h1>
      <p class="mdc-typography--headline3" id="Norris"></p>
-    <h1 class="mdc-typography--headline5">Access data from corona api stored in indexed db (Enter data between 2020-1-21 to 2020-5-3 in the format yyyy-mm-dd):</h1>
-    
+    <h1 class="mdc-typography--headline5">Access data from corona api stored in indexed db (Enter data between 2020-01-21 to 2020-05-03 in the format yyyy-mm-dd):</h1>
+ <label class="mdc-text-field mdc-text-field--filled">
+  <span class="mdc-text-field__ripple"></span>
+  <input class="mdc-text-field__input" type="text" aria-labelledby="my-label-id">
+  <span class="mdc-line-ripple"></span>
+</label>
+ <button class="mdc-button--outlined" id="submit">
+  <div class="mdc-button__ripple"></div>
+  <span class="mdc-button__label">Submit</span>
+</button>
+ <h1 class="mdc-typography--headline3" id="corona"></h1>
     
 </div>
       
@@ -94,14 +107,14 @@
   
 <script>
     
-   /*if ("serviceWorker" in navigator) {
+   if ("serviceWorker" in navigator) {
   window.addEventListener("load", function() {
     navigator.serviceWorker
       .register("/serviceWorker.js")
       .then(res => console.log("service worker registered"))
       .catch(err => console.log("service worker not registered", err))
   })
-}*/
+}
     mdc.topAppBar.MDCTopAppBar.attachTo(document.querySelector('header.mdc-top-app-bar'));
     document.querySelectorAll('.mdc-top-app-bar__section--align-end button').forEach(item=>{
         item.addEventListener("click",(event)=>{
@@ -179,7 +192,9 @@ function initMap() {
   });
 }
 
+
 var db = new Dexie("MyDatabase");
+
 db.version(1).stores({
     corona: "++id, date, deaths, confirmed",
 });
@@ -221,6 +236,20 @@ Promise.all([
 		console.log(error);
 	});
 
+    document.getElementById("submit").addEventListener("click",function() {
+	
+    db.transaction('rw',db.corona,async function(){
+          const co = db.corona.get({date:document.querySelector(".mdc-text-field__input").value});
+        
+        co.then(item=>{
+            document.querySelector("#corona").textContent = "Deaths: "+item.deaths+"   Confirmed Cases: "+item.confirmed;
+            console.log(item);});
+        
+    })
+    
+            
+});
+    
     </script>
   </body>
 </html>

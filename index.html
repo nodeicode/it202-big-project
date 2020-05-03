@@ -11,6 +11,8 @@
   <script async defer
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDtJXZwqspsmUyVoJ34zK9K0Msem2buMPE&callback=initMap">
     </script>
+   <script src="https://unpkg.com/dexie@latest/dist/dexie.js"></script>
+
 
   <style>
     :root {
@@ -75,6 +77,11 @@
       
 <div class="view" content="Table"id="Table">
 <!-- 2 endpoints data and table code-->
+    <h1 class="mdc-typography--headline5">Chuck norris random quote from api:</h1>
+     <p class="mdc-typography--headline3" id="Norris"></p>
+    <h1 class="mdc-typography--headline5">Access data from corona api stored in indexed db (Enter data between 2020-1-21 to 2020-5-3 in the format yyyy-mm-dd):</h1>
+    
+    
 </div>
       
 <div class="view " content="Chart"id="Chart">
@@ -171,7 +178,49 @@ function initMap() {
     infowindow.open(map, marker);
   });
 }
+
+var db = new Dexie("MyDatabase");
+db.version(1).stores({
+    corona: "++id, date, deaths, confirmed",
+});
+db.open(); 
+
+function add_new(date,deaths,confirmed){
+    db.transaction('rw', db.corona, function () {db.corona.add({date:date,deaths:deaths,confirmed:confirmed});
+    }).catch(function(err) {
+        console.error(err.stack || err);
+    });    
+}
+
+var apiendpt2 = "https://corona-api.com/countries/US";
+Promise.all([
+  fetch("https://matchilling-chuck-norris-jokes-v1.p.rapidapi.com/jokes/random", {
+	"method": "GET",
+	"headers": {
+		"x-rapidapi-host": "matchilling-chuck-norris-jokes-v1.p.rapidapi.com",
+		"x-rapidapi-key": "3aa9ad82abmsh9c89ebbd3dc713bp1976b8jsn99cbbb918dfb",
+		"accept": "application/json"
+	}
+}),
+  fetch(apiendpt2)
+])
+    .then(function (responses) {
+		return responses.map(function (response) {
+			return response.json();
+		});
+	}).then(function (data) {
     
+    data[0].then((json1)=>{
+        document.querySelector("#Norris").textContent = json1.value;
+        })
+    data[1].then((json2)=>{
+        json2.data.timeline.forEach((item)=>{add_new(item.date,item.deaths,item.confirmed);})
+        })
+            
+	}).catch(function (error) {
+		console.log(error);
+	});
+
     </script>
   </body>
 </html>

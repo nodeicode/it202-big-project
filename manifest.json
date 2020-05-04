@@ -8,7 +8,7 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "./favicon-ico-65.png",
+      "src": "/it202-big-project/favicon-ico-65.png",
       "type": "image/png", "sizes": "512x512"
     }
       ]
